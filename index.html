@@ -1,0 +1,975 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Expense Tracker — ET</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root{
+      --bg1: #ffffff;
+      --bg2: #f4fbff;
+      --primary: #1764f2;
+      --accent: #10b981; 
+      --muted: #777;
+      --card: rgba(255,255,255,0.96);
+      --glass: rgba(255,255,255,0.06);
+      --shadow: 0 8px 24px rgba(18,25,40,0.06);
+      --radius: 12px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg,#e8f2ff 0%, #ffffff 100%);
+      color:#12212e;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      min-height:100vh;
+      padding:18px;
+    }
+.quick-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  color: #12212e;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+  width: 320px;
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 9999;
+  display: none;
+}
+.quick-popup h4 {
+  margin-top: 0;
+  color: #072042;
+}
+.quick-popup .close-btn {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #333;
+}
+.quick-popup ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.quick-popup li {
+  padding: 8px;
+  border-bottom: 1px solid #eef6ff;
+  display: flex;
+  justify-content: space-between;
+}
+.quick-popup li span {
+  font-weight: 600;
+}
+   header.topnav{
+      display:flex;
+      justify-content:center;
+      gap:18px;
+      margin-bottom:18px;
+    }
+    header.topnav a {
+      color:#06304b;
+      text-decoration:none;
+      font-weight:600;
+      padding:8px 14px;
+      border-radius:10px;
+      background: linear-gradient(90deg,#ffffff,#eaf5ff);
+      box-shadow:0 6px 16px rgba(0,0,0,0.03);
+      border:1px solid rgba(7,32,52,0.03);
+    }
+    .stage{
+      max-width:1200px;
+      margin:0 auto;
+      padding:10px;
+    }
+
+   .landing{
+      display:flex;
+      gap:28px;
+      align-items:center;
+      justify-content:space-between;
+      background: linear-gradient(90deg,#eaf5ff 0%, #ffffff 100%);
+      padding:28px;
+      border-radius:16px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .left{
+      max-width:62%;
+    }
+    .logo-wrap{
+      display:flex;
+      gap:14px;
+      align-items:center;
+      margin-bottom:8px;
+    }
+    .v-icon{
+      width:66px;
+      height:66px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:14px;
+      background: linear-gradient(180deg,#081a12, #0d2b1f);
+      box-shadow: 0 6px 24px rgba(16,185,129,0.14), inset 0 -8px 20px rgba(255,255,255,0.02);
+      position:relative;
+    }
+    .v-icon svg{width:40px;height:40px; filter: drop-shadow(0 6px 18px rgba(16,185,129,0.25));}
+    .brand-title{
+      font-weight:700;
+      font-size:18px;
+      color:#06304b;
+    }
+    .hero h1{
+      font-size:36px;
+      margin:8px 0 12px 0;
+      color:#072042;
+      line-height:1.02;
+    }
+    .hero p{
+      margin:0 0 12px 0;
+      color: #274157;
+      font-weight:500;
+    }
+    .cta{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      margin-top:8px;
+    }
+    .btn{
+      border:0;
+      padding:10px 16px;
+      background:var(--primary);
+      color:white;
+      border-radius:10px;
+      font-weight:600;
+      cursor:pointer;
+      box-shadow: 0 8px 20px rgba(23,100,242,0.12);
+    }
+    .btn.secondary{
+      background:transparent;
+      color:var(--primary);
+      border:1px solid rgba(23,100,242,0.12);
+      box-shadow:none;
+    }
+
+    .right-card{
+      width:360px;
+      background:linear-gradient(180deg,#0b2340, #073049);
+      border-radius:14px;
+      padding:18px;
+      color:#cfe9ff;
+      box-shadow: 0 10px 40px rgba(3,35,72,0.12);
+    }
+    .right-card h3{margin:6px 0;font-size:16px}
+    .right-card p{font-size:13px;color:#b6dffb}
+
+    .frame{
+      margin-top:22px;
+    }
+    .card{
+      background:var(--card);
+      border-radius:14px;
+      padding:16px;
+      box-shadow: var(--shadow);
+      margin-bottom:18px;
+    }
+
+    .sequence{display:grid;gap:18px}
+    .form-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    input[type="text"], input[type="email"], input[type="password"], input[type="number"], select {
+      padding:10px 12px;border-radius:10px;border:1px solid #e6eefb;background:white;min-width:180px;font-size:14px;
+    }
+    label{display:block;font-size:13px;color:#425b6b;margin-bottom:6px}
+    .small{font-size:13px;color:var(--muted)}
+    .app{
+      display:grid;
+      grid-template-columns:250px 1fr;
+      gap:18px;
+      margin-top:12px;
+    }
+    .sidebar{
+      background:linear-gradient(180deg,#ffffff, #f4fbff);
+      border-radius:12px;padding:12px;box-shadow:var(--shadow);
+      height:calc(100vh - 240px);
+      position:sticky; top:20px;
+      overflow:auto;
+    }
+    .sidebar h4{margin:6px 0 14px 0}
+    .side-btn{display:flex;gap:10px;align-items:center;padding:10px;border-radius:8px;border:1px solid rgba(7,32,52,0.04);cursor:pointer;margin-bottom:8px;background:white}
+    .side-btn.active{background:linear-gradient(90deg,#e7f0ff,#ffffff);box-shadow:0 8px 22px rgba(23,100,242,0.06)}
+    .side-btn .ico{width:28px;height:28px;border-radius:8px;background:linear-gradient(180deg,#e9f6ff,#dff4ff);display:flex;align-items:center;justify-content:center;color:var(--primary)}
+
+    .main-area{min-height:480px}
+    .top-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+    .kpi{display:flex;gap:12px;flex-wrap:wrap}
+    .k-card{background:white;padding:12px;border-radius:10px;min-width:140px;box-shadow:0 6px 18px rgba(3,35,72,0.04)}
+    .k-card h3{margin:0;font-size:14px}
+    .k-card p{margin:6px 0 0 0;color:var(--muted);font-size:13px}
+
+    .expenses-list{margin-top:12px}
+    .expense-item{display:flex;justify-content:space-between;align-items:center;padding:10px;background:white;border-radius:8px;margin-bottom:8px;border-left:4px solid #eef7ff}
+    .expense-item .meta{display:flex;gap:12px;align-items:center}
+    .cat-chip{background:linear-gradient(90deg,#f0f9ff,#eef6ff);padding:8px;border-radius:8px;font-weight:600;color:#004e9e}
+    .expense-amt{font-weight:700}
+
+    .controls{display:flex;gap:10px;align-items:center;margin-top:10px}
+    .chart-wrap{background:white;border-radius:12px;padding:12px;margin-top:12px}
+
+    /* responsive */
+    @media (max-width: 940px){
+      .landing{flex-direction:column;align-items:flex-start}
+      .right-card{width:100%}
+      .app{grid-template-columns:1fr;min-width:100%}
+      .sidebar{position:relative;height:auto}
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+
+    <header class="topnav" id="topNav">
+      <a href="#home">Home</a>
+      <a href="#about">About</a>
+      <a href="#features">Features</a>
+      <a href="#contact">Contact</a>
+    </header>
+
+    <div class="landing card" id="landingCard">
+      <div class="left">
+        <div class="logo-wrap">
+          <div class="v-icon" aria-hidden>
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="V logo">
+              <defs>
+                <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
+                  <stop offset="0" stop-color="#10b981"/>
+                  <stop offset="1" stop-color="#06a77a"/>
+                </linearGradient>
+                <filter id="glow">
+                  <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+                  <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+              <g filter="url(#glow)" transform="translate(10,6)">
+                <path d="M20 8 L36 70 L50 32 L64 70 L80 8" stroke="url(#g1)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              </g>
+            </svg>
+          </div>
+          <div>
+            <div class="brand-title">Expensify-Lite</div>
+            <div class="small">The easiest way to track spending</div>
+          </div>
+        </div>
+
+        <div class="hero">
+          <h1>The easiest way<br>to track your expenses</h1>
+          <p>Start quick — add monthly income, pick currency and track daily spending with live charts, reports and budgeting tools.</p>
+
+          <div class="cta">
+            <button class="btn" id="getStartedBtn">Get Started</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-card">
+        <h3>How it works</h3>
+        <p>1) Click Get Started → 2) Fill name, email & password → 3) Select currency & monthly income → 4) Add expenses & watch the dashboard update instantly.</p>
+        <hr style="border:none;height:1px;background:rgba(255,255,255,0.06);margin:12px 0">
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div style="width:48px;height:48px;border-radius:10px;background:#072042;display:flex;align-items:center;justify-content:center;">
+            <i class="fa-solid fa-wallet" style="color:#9fe2ff"></i>
+          </div>
+          <div>
+            <div style="font-weight:700">Secure on your device</div>
+            <div style="font-size:13px;color:#bcdff8">All data stored locally in your browser — private and fast.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="frame sequence" id="sequenceWrap" style="margin-top:20px;">
+      <div id="screen-user" class="card" style="display:none">
+        <h3>Create account</h3>
+        <p class="small">Enter name, email and a password (local-only demo — stored on your device).</p>
+
+        <div style="margin-top:10px">
+          <label>Name</label>
+          <input id="inputName" type="text" placeholder="Your full name" />
+        </div>
+        <div style="margin-top:10px">
+          <label>Email</label>
+          <input id="inputEmail" type="email" placeholder="your@email.com" />
+        </div>
+        <div style="margin-top:10px">
+          <label>Password</label>
+          <input id="inputPass" type="password" placeholder="Choose a password" />
+        </div>
+
+        <div style="margin-top:12px;display:flex;gap:10px;">
+          <button class="btn" id="userNextBtn">Next: Currency & Income</button>
+          <button class="btn secondary" id="userBackBtn">Back</button>
+        </div>
+      </div>
+      <div id="screen-currency" class="card" style="display:none">
+        <h3>Currency & Monthly Income</h3>
+        <p class="small">Pick the currency to display amounts and enter your monthly income / budget.</p>
+
+        <div class="form-row" style="margin-top:10px">
+          <div>
+            <label>Currency</label>
+            <select id="selectCurrency">
+              <option value="INR">INR (₹)</option>
+              <option value="USD">USD ($)</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Monthly income / budget</label>
+            <input id="monthlyIncome" type="number" placeholder="e.g. 30000" />
+          </div>
+        </div>
+
+        <div style="margin-top:14px;display:flex;gap:10px">
+          <button class="btn" id="currencySaveBtn">Save & Start Using App</button>
+          <button class="btn secondary" id="currencyBackBtn">Back</button>
+        </div>
+      </div>
+
+
+      <div id="appRoot" style="display:none" class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <h2 id="welcomeUser">Hello!</h2>
+            <div class="small">Live workspace — your data is local to this browser.</div>
+          </div>
+
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="small">Currency: <strong id="showCurrency">INR</strong></div>
+            <button class="btn secondary" id="openSettings">Settings</button>
+            <button class="btn" id="signOutBtn">Sign Out</button>
+          </div>
+        </div>
+
+        <div class="app">
+          <div class="sidebar">
+            <h4>Workspace</h4>
+            <div id="navDashboard" class="side-btn active"><div class="ico"><i class="fa-solid fa-house"></i></div><div>Dashboard</div></div>
+            <div id="navAdd" class="side-btn"><div class="ico"><i class="fa-solid fa-plus"></i></div><div>Add Expense</div></div>
+            <div id="navAnalytics" class="side-btn"><div class="ico"><i class="fa-solid fa-chart-pie"></i></div><div>Analytics</div></div>
+            <div id="navReports" class="side-btn"><div class="ico"><i class="fa-solid fa-file-lines"></i></div><div>Reports</div></div>
+            <div id="navBudget" class="side-btn"><div class="ico"><i class="fa-solid fa-wallet"></i></div><div>Budgeting</div></div>
+
+            <hr style="margin:12px 0">
+            <div class="small">Quick categories</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
+              <div class="cat-chip" onclick="quickFilter('Food')">Food</div>
+              <div class="cat-chip" onclick="quickFilter('Transport')">Transport</div>
+              <div class="cat-chip" onclick="quickFilter('Groceries')">Groceries</div>
+              <div class="cat-chip" onclick="quickFilter('Shopping')">Shopping</div>
+              <div class="cat-chip" onclick="quickFilter('Bills')">Bills</div>
+              <div class="cat-chip" onclick="quickFilter('Health')">Health</div>
+            </div>
+
+            <div style="margin-top:12px" class="small">Tip: share this page URL with friends — they get their own local workspace.</div>
+          </div>
+          <div class="main-area">
+            <div id="view-dashboard">
+              <div class="top-row">
+                <div class="kpi">
+                  <div class="k-card">
+                    <h3>Total Expenses</h3>
+                    <p id="k_total">0</p>
+                  </div>
+                  <div class="k-card">
+                    <h3>Remaining Budget</h3>
+                    <p id="k_remaining">0</p>
+                  </div>
+                  <div class="k-card">
+                    <h3>Entries</h3>
+                    <p id="k_entries">0</p>
+                  </div>
+                </div>
+
+                <div style="min-width:240px; text-align:right">
+                  <div class="small">Monthly budget</div>
+                  <div style="font-weight:700; font-size:20px" id="displayBudget">0</div>
+                  <div style="margin-top:8px" class="small">Currency: <span id="displayCurrency">INR</span></div>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
+                <div style="flex:1;min-width:320px">
+                  <div class="card">
+                    <h4 style="margin-top:0">Recent expenses</h4>
+                    <div id="expensesList" class="expenses-list"></div>
+                  </div>
+
+                  <div class="card" style="margin-top:12px">
+                    <h4 style="margin-top:0">Add quick expense</h4>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap">
+                      <select id="quickCat"><option>Food</option><option>Groceries</option><option>Transport</option><option>Shopping</option><option>Entertainment</option><option>Other</option></select>
+                      <input id="quickAmt" type="number" placeholder="Amount" />
+                      <button class="btn" onclick="handleAddQuick()">Add</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="width:420px;min-width:300px">
+                  <div class="chart-wrap card" style="height:260px">
+                    <h4 style="margin-top:0">Spending by category</h4>
+                    <canvas id="chartCategory"></canvas>
+                  </div>
+
+                  <div class="chart-wrap card" style="margin-top:12px;height:220px">
+                    <h4 style="margin-top:0">Trend (last 12 entries)</h4>
+                    <canvas id="chartTrend"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+            <div id="view-add" style="display:none">
+              <div class="card">
+                <h4>Add new expense</h4>
+                <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                  <div>
+                    <label>Category</label>
+                    <select id="addCategory">
+                      <option>Food</option>
+                      <option>Groceries</option>
+                      <option>Transport</option>
+                      <option>Shopping</option>
+                      <option>Entertainment</option>
+                      <option>Health</option>
+                      <option>Other</option>
+                    </select>
+                  </div>
+
+                  <div id="otherTextWrap" style="display:none">
+                    <label>Specify category</label>
+                    <input type="text" id="otherText" placeholder="Enter category" />
+                  </div>
+
+                  <div>
+                    <label>Amount</label>
+                    <input id="addAmount" type="number" placeholder="0" />
+                  </div>
+
+                  <div>
+                    <label>Date</label>
+                    <input id="addDate" type="date" />
+                  </div>
+
+                  <div style="align-self:end">
+                    <button class="btn" onclick="addExpenseUI()">Add expense</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="view-analytics" style="display:none">
+              <div class="card">
+                <h4>Analytics</h4>
+                <div id="analyticsSummary" class="small" style="margin-bottom:10px"></div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap">
+                  <div style="flex:1;min-width:240px">
+                    <div class="k-card">
+                      <h3>Average expense</h3>
+                      <p id="avgExpense">0</p>
+                    </div>
+                  </div>
+                  <div style="flex:1;min-width:240px">
+                    <div class="k-card">
+                      <h3>Highest expense</h3>
+                      <p id="maxExpense">0</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+            <div id="view-reports" style="display:none">
+              <div class="card">
+                <h4>Reports</h4>
+                <div id="reportContainer"></div>
+                <div style="margin-top:10px">
+                  <button class="btn" onclick="downloadReport()">Download CSV</button>
+                </div>
+              </div>
+            </div>
+
+            <div id="view-budget" style="display:none">
+              <div class="card">
+                <h4>Budget & Settings</h4>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:end">
+                  <div>
+                    <label>Monthly budget</label>
+                    <input id="budgetInput" type="number" placeholder="Enter budget" />
+                  </div>
+
+                  <div>
+                    <label>Currency</label>
+                    <select id="budgetCurrency">
+                      <option value="INR">INR (₹)</option>
+                      <option value="USD">USD ($)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <button class="btn" onclick="saveBudgetSettings()">Save</button>
+                  </div>
+
+                  <div style="margin-left:auto">
+                    <div class="small">Profile</div>
+                    <div id="profileInfo"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div> 
+        </div> 
+      </div> 
+    </div>
+  </div>
+
+  <script>
+    const $ = id => document.getElementById(id);
+function quickFilter(cat) {
+  const filtered = expenses.filter(e => e.category.toLowerCase() === cat.toLowerCase());
+  const popup = $('quickPopup');
+  const list = $('quickPopupList');
+  const title = $('quickPopupTitle');
+
+  title.innerText = `Entries for ${cat}`;
+  list.innerHTML = '';
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<li><span>No entries</span></li>`;
+  } else {
+    filtered.forEach(e => {
+      const li = document.createElement('li');
+      li.innerHTML = `<span>${escapeHtml(e.date)}</span> <span>${fmtAmount(e.amount)}</span>`;
+      list.appendChild(li);
+    });
+  }
+
+  popup.style.display = 'block';
+}
+
+function closeQuickPopup() {
+  $('quickPopup').style.display = 'none';
+}
+    const KEY_CURRENT_USER = 'et_current_user';
+    function keyUserProfile(email){ return `et_user_${email}_profile`; }
+    function keyUserExpenses(email){ return `et_user_${email}_expenses`; }
+    function keyUserBudget(email){ return `et_user_${email}_budget`; }
+
+    let currentUser = null;
+    let profile = null;
+    let expenses = [];
+    let budget = 0;
+    let chartCat = null;
+    let chartTrend = null;
+
+    const currencySymbol = (c) => c === 'USD' ? '$' : '₹';
+    function fmtAmount(n){
+      if(isNaN(n)) n=0;
+      const cur = (profile && profile.currency) ? profile.currency : 'INR';
+      const sym = currencySymbol(cur);
+      if(cur === 'USD') return sym + Number(n).toFixed(2);
+      return sym + Math.round(n);
+    }
+
+
+    $('getStartedBtn').addEventListener('click', () => {
+
+      const top = $('topNav');
+      if(top) top.style.display = 'none';
+      $('landingCard').style.display = 'none';
+
+      $('screen-user').style.display = 'block';
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+
+    $('userBackBtn').addEventListener('click', () => {
+
+      $('screen-user').style.display = 'none';
+      $('landingCard').style.display = 'flex';
+      const top = $('topNav'); if(top) top.style.display = 'flex';
+    });
+
+
+    $('userNextBtn').addEventListener('click', () => {
+      const name = $('inputName').value.trim();
+      const email = $('inputEmail').value.trim().toLowerCase();
+      const pass = $('inputPass').value.trim();
+      if(!name || !email || !pass){ alert('Please fill name, email & password'); return; }
+
+
+      const stored = localStorage.getItem(keyUserProfile(email));
+      if(stored){
+        const p = JSON.parse(stored);
+        if(p.password && p.password === pass){
+
+          currentUser = email;
+          profile = p;
+          loadFromStorage();
+          openApp();
+          return;
+        } else {
+
+          if(!confirm('An account exists for this email. Creating a new account will overwrite it locally. Continue?')) return;
+        }
+      }
+
+      currentUser = email;
+      profile = { name, email, password: pass, currency: 'INR' };
+      localStorage.setItem(keyUserProfile(email), JSON.stringify(profile));
+  
+      localStorage.setItem(keyUserExpenses(email), JSON.stringify([]));
+      localStorage.setItem(keyUserBudget(email), JSON.stringify(0));
+   
+      $('screen-user').style.display = 'none';
+      $('screen-currency').style.display = 'block';
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+
+  
+    $('currencyBackBtn').addEventListener('click', () => {
+      $('screen-currency').style.display = 'none';
+      $('screen-user').style.display = 'block';
+    });
+
+   
+    $('currencySaveBtn').addEventListener('click', () => {
+      const cur = $('selectCurrency').value;
+      const income = parseFloat($('monthlyIncome').value || 0);
+      profile.currency = cur;
+      localStorage.setItem(keyUserProfile(currentUser), JSON.stringify(profile));
+      budget = isFinite(income) ? income : 0;
+      localStorage.setItem(keyUserBudget(currentUser), JSON.stringify(budget));
+      if(!localStorage.getItem(keyUserExpenses(currentUser))){
+        localStorage.setItem(keyUserExpenses(currentUser), JSON.stringify([]));
+      }
+      persistAll();
+      openApp();
+    });
+
+
+    $('signOutBtn').addEventListener('click', () => {
+      if(!confirm('Sign out?')) return;
+      localStorage.removeItem(KEY_CURRENT_USER);
+      currentUser = null;
+      profile = null;
+      expenses = [];
+      budget = 0;
+
+      $('appRoot').style.display = 'none';
+      $('landingCard').style.display = 'flex';
+      const top = $('topNav'); if(top) top.style.display = 'flex';
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+
+    window.addEventListener('load', () => {
+      const saved = localStorage.getItem(KEY_CURRENT_USER);
+      if(saved){
+        currentUser = saved;
+        loadFromStorage();
+        openApp();
+      }
+      attachUIEvents();
+    });
+
+
+    function persistAll(){
+      if(!currentUser) return;
+      localStorage.setItem(keyUserProfile(currentUser), JSON.stringify(profile));
+      localStorage.setItem(keyUserExpenses(currentUser), JSON.stringify(expenses));
+      localStorage.setItem(keyUserBudget(currentUser), JSON.stringify(budget));
+      localStorage.setItem(KEY_CURRENT_USER, currentUser);
+    }
+    function loadFromStorage(){
+      if(!currentUser) return;
+      const savedProfile = localStorage.getItem(keyUserProfile(currentUser));
+      profile = savedProfile ? JSON.parse(savedProfile) : profile;
+      const savedExp = localStorage.getItem(keyUserExpenses(currentUser));
+      expenses = savedExp ? JSON.parse(savedExp) : [];
+      const savedBudget = localStorage.getItem(keyUserBudget(currentUser));
+      budget = savedBudget ? JSON.parse(savedBudget) : (budget || 0);
+      localStorage.setItem(KEY_CURRENT_USER, currentUser);
+    }
+
+    function openApp(){
+      localStorage.setItem(KEY_CURRENT_USER, currentUser);
+      loadFromStorage();
+
+      ['screen-user','screen-currency'].forEach(s=>{ const el=$(s); if(el) el.style.display='none'; });
+      $('landingCard').style.display = 'none';
+      const top = $('topNav'); if(top) top.style.display = 'none';
+
+      $('appRoot').style.display = 'block';
+
+      $('welcomeUser').innerText = `Hello, ${profile.name}`;
+      $('showCurrency').innerText = profile.currency;
+      $('displayCurrency').innerText = profile.currency;
+      updateAllUI();
+      selectNav('navDashboard');
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    function attachUIEvents(){
+      ['navDashboard','navAdd','navAnalytics','navReports','navBudget'].forEach(id=>{
+        const el = $(id);
+        if(el) el.addEventListener('click', ()=> selectNav(id));
+      });
+
+      $('addCategory').addEventListener('change', () => {
+        const v = $('addCategory').value;
+        $('otherTextWrap').style.display = (v === 'Other') ? 'block' : 'none';
+      });
+
+      $('addDate').value = todayStrOffset(0);
+    }
+
+    function selectNav(id){
+      ['navDashboard','navAdd','navAnalytics','navReports','navBudget'].forEach(i=>{ $(i).classList.remove('active'); });
+      $(id).classList.add('active');
+      ['view-dashboard','view-add','view-analytics','view-reports','view-budget'].forEach(v=>{ if($(v)) $(v).style.display='none'; });
+      if(id === 'navDashboard'){ $('view-dashboard').style.display='block'; updateAllUI(); }
+      if(id === 'navAdd'){ $('view-add').style.display='block'; }
+      if(id === 'navAnalytics'){ $('view-analytics').style.display='block'; renderAnalytics(); }
+      if(id === 'navReports'){ $('view-reports').style.display='block'; renderReports(); }
+      if(id === 'navBudget'){ $('view-budget').style.display='block'; renderSettings(); }
+    }
+
+    function addExpenseUI(){
+      let category = $('addCategory').value;
+      if(category === 'Other'){
+        const other = $('otherText').value.trim();
+        if(!other){ alert('Please specify Other category'); return; }
+        category = other;
+      }
+      const amount = parseFloat($('addAmount').value);
+      const date = $('addDate').value || todayStrOffset(0);
+      if(!category || isNaN(amount) || amount<=0){ alert('Enter valid category and amount'); return; }
+      const entry = { id: genId(), category, amount: Number(amount), date };
+      expenses.unshift(entry);
+      persistAll();
+
+      $('addAmount').value=''; $('otherText').value=''; $('addCategory').value='Food'; $('addDate').value=todayStrOffset(0);
+      updateAllUI();
+    }
+
+    function handleAddQuick(){
+      const cat = $('quickCat').value;
+      const amt = parseFloat($('quickAmt').value);
+      if(isNaN(amt) || amt<=0){ alert('Enter amount'); return; }
+      const category = (cat === 'Other') ? 'Other' : cat;
+      expenses.unshift({id:genId(), category, amount: Number(amt), date: todayStrOffset(0)});
+      $('quickAmt').value='';
+      persistAll();
+      updateAllUI();
+    }
+
+    function updateAllUI(){
+      if(!currentUser) return;
+      loadFromStorage();
+      const total = expenses.reduce((s,e)=> s + Number(e.amount), 0);
+      $('k_total').innerText = fmtAmount(total);
+      $('k_entries').innerText = expenses.length;
+      $('k_remaining').innerText = fmtAmount(budget - total);
+      $('displayBudget').innerText = fmtAmount(budget);
+      $('displayCurrency').innerText = profile.currency;
+
+
+      const listWrap = $('expensesList'); listWrap.innerHTML = '';
+      if(expenses.length===0){
+        listWrap.innerHTML = '<div class="small">No expenses yet — add one from Add Expense.</div>';
+      } else {
+        expenses.slice(0,20).forEach(e => {
+          const d = document.createElement('div');
+          d.className = 'expense-item';
+          d.innerHTML = `<div class="meta"><div class="cat-chip">${escapeHtml(e.category)}</div>
+                          <div style="font-size:13px;color:#445b66">${escapeHtml(e.date)}</div></div>
+                          <div style="display:flex;gap:8px;align-items:center">
+                            <div class="expense-amt">${fmtAmount(e.amount)}</div>
+                            <button class="btn secondary" style="padding:6px 8px" onclick="deleteExpense('${e.id}')">Delete</button>
+                          </div>`;
+          listWrap.appendChild(d);
+        });
+      }
+
+
+      renderCategoryChart();
+      renderTrendChart();
+
+      renderAnalytics();
+      renderReports();
+
+
+      $('profileInfo').innerHTML = `<div style="font-weight:600">${escapeHtml(profile.name)}</div><div class="small">${escapeHtml(profile.email)}</div>`;
+    }
+
+    function deleteExpense(id){
+      if(!confirm('Delete this expense?')) return;
+      expenses = expenses.filter(e => e.id !== id);
+      persistAll();
+      updateAllUI();
+    }
+
+
+    function renderCategoryChart(){
+      const ctx = $('chartCategory').getContext('2d');
+      const agg = expenses.reduce((acc,e)=> { acc[e.category] = (acc[e.category]||0)+Number(e.amount); return acc; }, {});
+      const labels = Object.keys(agg);
+      const data = Object.values(agg);
+      if(chartCat) chartCat.destroy();
+      chartCat = new Chart(ctx, {
+        type:'doughnut',
+        data:{ labels, datasets:[{ data, backgroundColor: generateColors(labels.length) }] },
+        options:{ plugins:{legend:{position:'bottom'}}, maintainAspectRatio:false }
+      });
+    }
+
+    function renderTrendChart(){
+      const ctx = $('chartTrend').getContext('2d');
+      const last = expenses.slice(0,12).reverse();
+      const labels = last.map(e => e.date.slice(5));
+      const data = last.map(e => e.amount);
+      if(chartTrend) chartTrend.destroy();
+      chartTrend = new Chart(ctx, {
+        type:'line',
+        data:{ labels, datasets:[{ label:'Amount', data, borderColor:'#1764f2', backgroundColor:'rgba(23,100,242,0.12)', tension:0.25, fill:true }] },
+        options:{ plugins:{legend:{display:false}}, maintainAspectRatio:false }
+      });
+    }
+
+    function renderAnalytics(){
+      const total = expenses.reduce((s,e)=> s + Number(e.amount), 0);
+      const avg = expenses.length ? (total/expenses.length) : 0;
+      const max = expenses.length ? Math.max(...expenses.map(e=>e.amount)) : 0;
+      $('avgExpense').innerText = fmtAmount(avg);
+      $('maxExpense').innerText = fmtAmount(max);
+      $('analyticsSummary').innerText = `You have ${expenses.length} entries. Total this period: ${fmtAmount(total)}.`;
+    }
+
+    function renderReports(){
+      const total = expenses.reduce((s,e)=> s + Number(e.amount), 0);
+      const reportDiv = $('reportContainer');
+      if(!reportDiv) return;
+      reportDiv.innerHTML = `<div class="small">Total expenses: <strong>${fmtAmount(total)}</strong></div>
+        <div style="margin-top:10px">
+          <table style="width:100%;border-collapse:collapse">
+            <thead><tr style="text-align:left"><th>Category</th><th>Date</th><th>Amount</th></tr></thead>
+            <tbody id="reportRows"></tbody>
+          </table>
+        </div>`;
+      const rows = $('reportRows'); rows.innerHTML = '';
+      expenses.forEach(e => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td style="padding:8px;border-bottom:1px solid #eef6ff">${escapeHtml(e.category)}</td>
+                        <td style="padding:8px;border-bottom:1px solid #eef6ff">${escapeHtml(e.date)}</td>
+                        <td style="padding:8px;border-bottom:1px solid #eef6ff">${fmtAmount(e.amount)}</td>`;
+        rows.appendChild(tr);
+      });
+    }
+
+    function downloadReport(){
+      if(expenses.length===0){ alert('No data to export'); return; }
+      const header = ['category','date','amount'];
+      const csv = [header.join(',')].concat(expenses.map(e => `${quoteCsv(e.category)},${e.date},${e.amount}`)).join('\n');
+      const blob = new Blob([csv], {type:'text/csv'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `expenses_${(profile.email||'user')}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function quoteCsv(v){ return `"${String(v).replace(/"/g,'""')}"`; }
+
+
+    function renderSettings(){
+      $('budgetInput').value = budget || '';
+      $('budgetCurrency').value = profile.currency || 'INR';
+    }
+    function saveBudgetSettings(){
+      const b = parseFloat($('budgetInput').value || 0);
+      const c = $('budgetCurrency').value;
+      budget = isFinite(b) ? b : 0;
+      profile.currency = c;
+      persistAll();
+      updateAllUI();
+      alert('Budget & currency saved ✅');
+    }
+
+
+    function genId(){ return 'e_'+Math.random().toString(36).slice(2,9); }
+    function todayStrOffset(offset=0){
+      const d = new Date(); d.setDate(d.getDate() + offset); return d.toISOString().slice(0,10);
+    }
+    function generateColors(n){
+      const base = ['#FF6384','#36A2EB','#FFCE56','#8BC34A','#9C27B0','#F97316','#06B6D4','#F472B6'];
+      const out = []; for(let i=0;i<n;i++) out.push(base[i % base.length]); return out;
+    }
+    function escapeHtml(s){ return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    function quickFilter(cat){
+      const filtered = expenses.filter(e => e.category === cat);
+      if(!filtered.length){ alert('No entries for ' + cat); return; }
+      const listWrap = $('expensesList'); listWrap.innerHTML = '';
+      filtered.forEach(e => {
+        const d = document.createElement('div'); d.className='expense-item';
+        d.innerHTML = `<div class="meta"><div class="cat-chip">${escapeHtml(e.category)}</div>
+                        <div style="font-size:13px;color:#445b66">${escapeHtml(e.date)}</div></div>
+                        <div style="display:flex;gap:8px;align-items:center">
+                          <div class="expense-amt">${fmtAmount(e.amount)}</div>
+                        </div>`;
+        listWrap.appendChild(d);
+      });
+    }
+
+    $('budgetInput').addEventListener && $('budgetInput').addEventListener('keypress', (e)=> { if(e.key==='Enter') saveBudgetSettings(); });
+
+
+    $('inputEmail').addEventListener('change', function(){
+      const email = this.value.trim().toLowerCase();
+      if(!email) return;
+      const stored = localStorage.getItem(keyUserProfile(email));
+      if(stored){
+        const p = JSON.parse(stored);
+        $('inputName').value = p.name || '';
+
+        if(!$('inputEmail').nextElementSibling || $('inputEmail').nextElementSibling.className !== 'small'){
+          const hint = document.createElement('div'); hint.className='small'; hint.style.marginTop='6px';
+          hint.innerText = 'Existing account found — enter password to continue (will sign you in).';
+          $('inputEmail').parentNode.appendChild(hint);
+        }
+      }
+    });
+
+    try{ $('otherTextWrap').style.display='none'; } catch(e){}
+
+  </script>
+</body>
+</html>
